@@ -1,0 +1,165 @@
+basePath: /
+definitions:
+  account.Account:
+    properties:
+      created_at:
+        type: string
+      document_number:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  account.CreateRequest:
+    properties:
+      document_number:
+        type: string
+      name:
+        type: string
+    type: object
+  account.CreateResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+  pkgerr.ServiceErrorResponseBody:
+    properties:
+      code:
+        type: string
+      msg:
+        type: string
+      namespace:
+        type: string
+    type: object
+  pkgerr.ValidationErrorResponseBody:
+    properties:
+      code:
+        type: string
+      errors:
+        additionalProperties:
+          type: string
+        type: object
+      namespace:
+        type: string
+    type: object
+  transaction.CreateRequest:
+    properties:
+      account_id:
+        type: integer
+      amount:
+        type: number
+      operation_type_id:
+        type: integer
+    type: object
+  transaction.CreateResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a server which store accounts and transaction details
+  title: Transactions Service
+  version: "1.0"
+paths:
+  /api/v1/accounts:
+    post:
+      parameters:
+      - description: account details to create
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/account.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/account.CreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkgerr.ValidationErrorResponseBody'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkgerr.ServiceErrorResponseBody'
+      security:
+      - ApiKeyAuth: []
+      summary: create a account
+      tags:
+      - account
+  /api/v1/accounts/{id}:
+    get:
+      parameters:
+      - description: account id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/account.Account'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkgerr.ValidationErrorResponseBody'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkgerr.ServiceErrorResponseBody'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkgerr.ServiceErrorResponseBody'
+      security:
+      - ApiKeyAuth: []
+      summary: get an account
+      tags:
+      - account
+  /api/v1/transactions:
+    post:
+      parameters:
+      - description: transaction details to create
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/transaction.CreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/transaction.CreateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkgerr.ValidationErrorResponseBody'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkgerr.ServiceErrorResponseBody'
+      security:
+      - ApiKeyAuth: []
+      summary: create a transaction
+      tags:
+      - transaction
+securityDefinitions:
+  ApiKeyAuth:
+    description: A Basic way to secure APIs
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

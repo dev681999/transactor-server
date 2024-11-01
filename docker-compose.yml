@@ -1,0 +1,59 @@
+name: transactor
+
+services:
+  # the database, a postgres 16 bookworm image for the smallest and safest image
+  db:
+    container_name: transactor-db
+    restart: on-failure
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_USER: pismo
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: pismo
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U pismo -d pismo'"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  # a beautiful web based gui to view the postgres data https://github.com/sosedoff/pgweb
+  db-web:
+    container_name: transactor-db-web
+    restart: on-failure
+    image: sosedoff/pgweb
+    command: --host db --user pismo --db pismo --pass verysafepassword --ssl disable
+    ports:
+      - 8081:8081
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/api/info || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  # the server
+  server:
+    container_name: transactor-server
+    image: ghcr.io/dev681999/transactor-server:main
+    restart: on-failure
+    environment:
+      - APP_DB_HOST=db
+      - APP_DB_PASSWORD=${DB_PASSWORD}
+      - APP_DB_MIGRATIONSFOLDER=/migrations
+      - APP_SERVER_ENABLETELEMETRY=${APP_SERVER_ENABLETELEMETRY}
+      - APP_SERVER_OTELENDPOINT=host.docker.internal:4317
+      - APP_SERVER_APIKEY=${API_KEY}
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
