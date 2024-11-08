@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/predicate"
-	"transactor-server/pkg/db/ent/transaction"
 	"context"
 	"errors"
 	"fmt"
 	"time"
+	"transactor-server/pkg/db/ent/predicate"
+	"transactor-server/pkg/db/ent/transaction"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -32,6 +32,27 @@ func (tu *TransactionUpdate) Where(ps ...predicate.Transaction) *TransactionUpda
 // SetUpdateTime sets the "update_time" field.
 func (tu *TransactionUpdate) SetUpdateTime(t time.Time) *TransactionUpdate {
 	tu.mutation.SetUpdateTime(t)
+	return tu
+}
+
+// SetBalance sets the "balance" field.
+func (tu *TransactionUpdate) SetBalance(f float64) *TransactionUpdate {
+	tu.mutation.ResetBalance()
+	tu.mutation.SetBalance(f)
+	return tu
+}
+
+// SetNillableBalance sets the "balance" field if the given value is not nil.
+func (tu *TransactionUpdate) SetNillableBalance(f *float64) *TransactionUpdate {
+	if f != nil {
+		tu.SetBalance(*f)
+	}
+	return tu
+}
+
+// AddBalance adds f to the "balance" field.
+func (tu *TransactionUpdate) AddBalance(f float64) *TransactionUpdate {
+	tu.mutation.AddBalance(f)
 	return tu
 }
 
@@ -108,6 +129,12 @@ func (tu *TransactionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.UpdateTime(); ok {
 		_spec.SetField(transaction.FieldUpdateTime, field.TypeTime, value)
 	}
+	if value, ok := tu.mutation.Balance(); ok {
+		_spec.SetField(transaction.FieldBalance, field.TypeFloat64, value)
+	}
+	if value, ok := tu.mutation.AddedBalance(); ok {
+		_spec.AddField(transaction.FieldBalance, field.TypeFloat64, value)
+	}
 	_spec.AddModifiers(tu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -133,6 +160,27 @@ type TransactionUpdateOne struct {
 // SetUpdateTime sets the "update_time" field.
 func (tuo *TransactionUpdateOne) SetUpdateTime(t time.Time) *TransactionUpdateOne {
 	tuo.mutation.SetUpdateTime(t)
+	return tuo
+}
+
+// SetBalance sets the "balance" field.
+func (tuo *TransactionUpdateOne) SetBalance(f float64) *TransactionUpdateOne {
+	tuo.mutation.ResetBalance()
+	tuo.mutation.SetBalance(f)
+	return tuo
+}
+
+// SetNillableBalance sets the "balance" field if the given value is not nil.
+func (tuo *TransactionUpdateOne) SetNillableBalance(f *float64) *TransactionUpdateOne {
+	if f != nil {
+		tuo.SetBalance(*f)
+	}
+	return tuo
+}
+
+// AddBalance adds f to the "balance" field.
+func (tuo *TransactionUpdateOne) AddBalance(f float64) *TransactionUpdateOne {
+	tuo.mutation.AddBalance(f)
 	return tuo
 }
 
@@ -238,6 +286,12 @@ func (tuo *TransactionUpdateOne) sqlSave(ctx context.Context) (_node *Transactio
 	}
 	if value, ok := tuo.mutation.UpdateTime(); ok {
 		_spec.SetField(transaction.FieldUpdateTime, field.TypeTime, value)
+	}
+	if value, ok := tuo.mutation.Balance(); ok {
+		_spec.SetField(transaction.FieldBalance, field.TypeFloat64, value)
+	}
+	if value, ok := tuo.mutation.AddedBalance(); ok {
+		_spec.AddField(transaction.FieldBalance, field.TypeFloat64, value)
 	}
 	_spec.AddModifiers(tuo.modifiers...)
 	_node = &Transaction{config: tuo.config}

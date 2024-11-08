@@ -22,6 +22,8 @@ const (
 	FieldAccountID = "account_id"
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
+	// FieldBalance holds the string denoting the balance field in the database.
+	FieldBalance = "balance"
 	// FieldOperationTypeID holds the string denoting the operation_type_id field in the database.
 	FieldOperationTypeID = "operation_type_id"
 	// FieldTimestamp holds the string denoting the timestamp field in the database.
@@ -55,6 +57,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldAccountID,
 	FieldAmount,
+	FieldBalance,
 	FieldOperationTypeID,
 	FieldTimestamp,
 }
@@ -104,6 +107,11 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 // ByAmount orders the results by the amount field.
 func ByAmount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAmount, opts...).ToFunc()
+}
+
+// ByBalance orders the results by the balance field.
+func ByBalance(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBalance, opts...).ToFunc()
 }
 
 // ByOperationTypeID orders the results by the operation_type_id field.

@@ -20,6 +20,7 @@ func (Transaction) Fields() []ent.Field {
 		field.Int("id"),
 		field.Int("account_id").Immutable(),
 		field.Float("amount").Immutable(),
+		field.Float("balance").Default(0),
 		field.Int("operation_type_id").Immutable(),
 		field.Time("timestamp").Immutable(),
 	}

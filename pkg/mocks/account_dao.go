@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	account "transactor-server/pkg/account"
 	context "context"
+	account "transactor-server/pkg/account"
 
 	ent "transactor-server/pkg/db/ent"
 

@@ -3,11 +3,11 @@
 package ent
 
 import (
+	"time"
 	"transactor-server/pkg/db/ent/account"
 	"transactor-server/pkg/db/ent/operationtype"
 	"transactor-server/pkg/db/ent/transaction"
 	"transactor-server/pkg/db/schema"
-	"time"
 )
 
 // The init function reads all schema descriptors with runtime code

@@ -3,10 +3,10 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/account"
 	"fmt"
 	"strings"
 	"time"
+	"transactor-server/pkg/db/ent/account"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

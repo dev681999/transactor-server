@@ -42,6 +42,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "amount", Type: field.TypeFloat64},
+		{Name: "balance", Type: field.TypeFloat64},
 		{Name: "timestamp", Type: field.TypeTime},
 		{Name: "account_id", Type: field.TypeInt},
 		{Name: "operation_type_id", Type: field.TypeInt},
@@ -54,13 +55,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "transactions_accounts_transactions",
-				Columns:    []*schema.Column{TransactionsColumns[5]},
+				Columns:    []*schema.Column{TransactionsColumns[6]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "transactions_operation_types_transactions",
-				Columns:    []*schema.Column{TransactionsColumns[6]},
+				Columns:    []*schema.Column{TransactionsColumns[7]},
 				RefColumns: []*schema.Column{OperationTypesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -69,22 +70,22 @@ var (
 			{
 				Name:    "transaction_account_id",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[5]},
+				Columns: []*schema.Column{TransactionsColumns[6]},
 			},
 			{
 				Name:    "transaction_account_id_operation_type_id",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[5], TransactionsColumns[6]},
+				Columns: []*schema.Column{TransactionsColumns[6], TransactionsColumns[7]},
 			},
 			{
 				Name:    "transaction_account_id_timestamp",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[5], TransactionsColumns[4]},
+				Columns: []*schema.Column{TransactionsColumns[6], TransactionsColumns[5]},
 			},
 			{
 				Name:    "transaction_account_id_operation_type_id_timestamp",
 				Unique:  false,
-				Columns: []*schema.Column{TransactionsColumns[5], TransactionsColumns[6], TransactionsColumns[4]},
+				Columns: []*schema.Column{TransactionsColumns[6], TransactionsColumns[7], TransactionsColumns[5]},
 			},
 		},
 	}

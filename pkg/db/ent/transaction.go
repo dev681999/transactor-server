@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/account"
-	"transactor-server/pkg/db/ent/operationtype"
-	"transactor-server/pkg/db/ent/transaction"
 	"fmt"
 	"strings"
 	"time"
+	"transactor-server/pkg/db/ent/account"
+	"transactor-server/pkg/db/ent/operationtype"
+	"transactor-server/pkg/db/ent/transaction"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -27,6 +27,8 @@ type Transaction struct {
 	AccountID int `json:"account_id,omitempty"`
 	// Amount holds the value of the "amount" field.
 	Amount float64 `json:"amount,omitempty"`
+	// Balance holds the value of the "balance" field.
+	Balance float64 `json:"balance,omitempty"`
 	// OperationTypeID holds the value of the "operation_type_id" field.
 	OperationTypeID int `json:"operation_type_id,omitempty"`
 	// Timestamp holds the value of the "timestamp" field.
@@ -75,7 +77,7 @@ func (*Transaction) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case transaction.FieldAmount:
+		case transaction.FieldAmount, transaction.FieldBalance:
 			values[i] = new(sql.NullFloat64)
 		case transaction.FieldID, transaction.FieldAccountID, transaction.FieldOperationTypeID:
 			values[i] = new(sql.NullInt64)
@@ -125,6 +127,12 @@ func (t *Transaction) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field amount", values[i])
 			} else if value.Valid {
 				t.Amount = value.Float64
+			}
+		case transaction.FieldBalance:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field balance", values[i])
+			} else if value.Valid {
+				t.Balance = value.Float64
 			}
 		case transaction.FieldOperationTypeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -195,6 +203,9 @@ func (t *Transaction) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("amount=")
 	builder.WriteString(fmt.Sprintf("%v", t.Amount))
+	builder.WriteString(", ")
+	builder.WriteString("balance=")
+	builder.WriteString(fmt.Sprintf("%v", t.Balance))
 	builder.WriteString(", ")
 	builder.WriteString("operation_type_id=")
 	builder.WriteString(fmt.Sprintf("%v", t.OperationTypeID))

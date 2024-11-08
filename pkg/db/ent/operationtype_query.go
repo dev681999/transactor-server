@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/operationtype"
-	"transactor-server/pkg/db/ent/predicate"
-	"transactor-server/pkg/db/ent/transaction"
 	"context"
 	"database/sql/driver"
 	"fmt"
 	"math"
+	"transactor-server/pkg/db/ent/operationtype"
+	"transactor-server/pkg/db/ent/predicate"
+	"transactor-server/pkg/db/ent/transaction"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

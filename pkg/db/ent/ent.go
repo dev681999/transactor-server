@@ -3,14 +3,14 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/account"
-	"transactor-server/pkg/db/ent/operationtype"
-	"transactor-server/pkg/db/ent/transaction"
 	"context"
 	"errors"
 	"fmt"
 	"reflect"
 	"sync"
+	"transactor-server/pkg/db/ent/account"
+	"transactor-server/pkg/db/ent/operationtype"
+	"transactor-server/pkg/db/ent/transaction"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"

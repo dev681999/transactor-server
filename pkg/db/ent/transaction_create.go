@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/account"
-	"transactor-server/pkg/db/ent/operationtype"
-	"transactor-server/pkg/db/ent/transaction"
 	"context"
 	"errors"
 	"fmt"
 	"time"
+	"transactor-server/pkg/db/ent/account"
+	"transactor-server/pkg/db/ent/operationtype"
+	"transactor-server/pkg/db/ent/transaction"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -61,6 +61,12 @@ func (tc *TransactionCreate) SetAccountID(i int) *TransactionCreate {
 // SetAmount sets the "amount" field.
 func (tc *TransactionCreate) SetAmount(f float64) *TransactionCreate {
 	tc.mutation.SetAmount(f)
+	return tc
+}
+
+// SetBalance sets the "balance" field.
+func (tc *TransactionCreate) SetBalance(f float64) *TransactionCreate {
+	tc.mutation.SetBalance(f)
 	return tc
 }
 
@@ -151,6 +157,9 @@ func (tc *TransactionCreate) check() error {
 	if _, ok := tc.mutation.Amount(); !ok {
 		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "Transaction.amount"`)}
 	}
+	if _, ok := tc.mutation.Balance(); !ok {
+		return &ValidationError{Name: "balance", err: errors.New(`ent: missing required field "Transaction.balance"`)}
+	}
 	if _, ok := tc.mutation.OperationTypeID(); !ok {
 		return &ValidationError{Name: "operation_type_id", err: errors.New(`ent: missing required field "Transaction.operation_type_id"`)}
 	}
@@ -207,6 +216,10 @@ func (tc *TransactionCreate) createSpec() (*Transaction, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Amount(); ok {
 		_spec.SetField(transaction.FieldAmount, field.TypeFloat64, value)
 		_node.Amount = value
+	}
+	if value, ok := tc.mutation.Balance(); ok {
+		_spec.SetField(transaction.FieldBalance, field.TypeFloat64, value)
+		_node.Balance = value
 	}
 	if value, ok := tc.mutation.Timestamp(); ok {
 		_spec.SetField(transaction.FieldTimestamp, field.TypeTime, value)
@@ -310,6 +323,24 @@ func (u *TransactionUpsert) UpdateUpdateTime() *TransactionUpsert {
 	return u
 }
 
+// SetBalance sets the "balance" field.
+func (u *TransactionUpsert) SetBalance(v float64) *TransactionUpsert {
+	u.Set(transaction.FieldBalance, v)
+	return u
+}
+
+// UpdateBalance sets the "balance" field to the value that was provided on create.
+func (u *TransactionUpsert) UpdateBalance() *TransactionUpsert {
+	u.SetExcluded(transaction.FieldBalance)
+	return u
+}
+
+// AddBalance adds v to the "balance" field.
+func (u *TransactionUpsert) AddBalance(v float64) *TransactionUpsert {
+	u.Add(transaction.FieldBalance, v)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -384,6 +415,27 @@ func (u *TransactionUpsertOne) SetUpdateTime(v time.Time) *TransactionUpsertOne 
 func (u *TransactionUpsertOne) UpdateUpdateTime() *TransactionUpsertOne {
 	return u.Update(func(s *TransactionUpsert) {
 		s.UpdateUpdateTime()
+	})
+}
+
+// SetBalance sets the "balance" field.
+func (u *TransactionUpsertOne) SetBalance(v float64) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetBalance(v)
+	})
+}
+
+// AddBalance adds v to the "balance" field.
+func (u *TransactionUpsertOne) AddBalance(v float64) *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.AddBalance(v)
+	})
+}
+
+// UpdateBalance sets the "balance" field to the value that was provided on create.
+func (u *TransactionUpsertOne) UpdateBalance() *TransactionUpsertOne {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateBalance()
 	})
 }
 
@@ -627,6 +679,27 @@ func (u *TransactionUpsertBulk) SetUpdateTime(v time.Time) *TransactionUpsertBul
 func (u *TransactionUpsertBulk) UpdateUpdateTime() *TransactionUpsertBulk {
 	return u.Update(func(s *TransactionUpsert) {
 		s.UpdateUpdateTime()
+	})
+}
+
+// SetBalance sets the "balance" field.
+func (u *TransactionUpsertBulk) SetBalance(v float64) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.SetBalance(v)
+	})
+}
+
+// AddBalance adds v to the "balance" field.
+func (u *TransactionUpsertBulk) AddBalance(v float64) *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.AddBalance(v)
+	})
+}
+
+// UpdateBalance sets the "balance" field to the value that was provided on create.
+func (u *TransactionUpsertBulk) UpdateBalance() *TransactionUpsertBulk {
+	return u.Update(func(s *TransactionUpsert) {
+		s.UpdateBalance()
 	})
 }
 

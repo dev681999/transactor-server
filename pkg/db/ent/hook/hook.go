@@ -3,9 +3,9 @@
 package hook
 
 import (
-	"transactor-server/pkg/db/ent"
 	"context"
 	"fmt"
+	"transactor-server/pkg/db/ent"
 )
 
 // The AccountFunc type is an adapter to allow the use of ordinary

@@ -3,9 +3,9 @@
 package ent
 
 import (
+	"context"
 	"transactor-server/pkg/db/ent/predicate"
 	"transactor-server/pkg/db/ent/transaction"
-	"context"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	ent "transactor-server/pkg/db/ent"
 	context "context"
+	ent "transactor-server/pkg/db/ent"
 
 	mock "github.com/stretchr/testify/mock"
 )

@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	transaction "transactor-server/pkg/transaction"
 	context "context"
+	transaction "transactor-server/pkg/transaction"
 
 	mock "github.com/stretchr/testify/mock"
 )

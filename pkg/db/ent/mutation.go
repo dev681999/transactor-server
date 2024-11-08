@@ -3,15 +3,15 @@
 package ent
 
 import (
-	"transactor-server/pkg/db/ent/account"
-	"transactor-server/pkg/db/ent/operationtype"
-	"transactor-server/pkg/db/ent/predicate"
-	"transactor-server/pkg/db/ent/transaction"
 	"context"
 	"errors"
 	"fmt"
 	"sync"
 	"time"
+	"transactor-server/pkg/db/ent/account"
+	"transactor-server/pkg/db/ent/operationtype"
+	"transactor-server/pkg/db/ent/predicate"
+	"transactor-server/pkg/db/ent/transaction"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -1215,6 +1215,8 @@ type TransactionMutation struct {
 	update_time           *time.Time
 	amount                *float64
 	addamount             *float64
+	balance               *float64
+	addbalance            *float64
 	timestamp             *time.Time
 	clearedFields         map[string]struct{}
 	account               *int
@@ -1494,6 +1496,62 @@ func (m *TransactionMutation) ResetAmount() {
 	m.addamount = nil
 }
 
+// SetBalance sets the "balance" field.
+func (m *TransactionMutation) SetBalance(f float64) {
+	m.balance = &f
+	m.addbalance = nil
+}
+
+// Balance returns the value of the "balance" field in the mutation.
+func (m *TransactionMutation) Balance() (r float64, exists bool) {
+	v := m.balance
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBalance returns the old "balance" field's value of the Transaction entity.
+// If the Transaction object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TransactionMutation) OldBalance(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBalance is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBalance requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBalance: %w", err)
+	}
+	return oldValue.Balance, nil
+}
+
+// AddBalance adds f to the "balance" field.
+func (m *TransactionMutation) AddBalance(f float64) {
+	if m.addbalance != nil {
+		*m.addbalance += f
+	} else {
+		m.addbalance = &f
+	}
+}
+
+// AddedBalance returns the value that was added to the "balance" field in this mutation.
+func (m *TransactionMutation) AddedBalance() (r float64, exists bool) {
+	v := m.addbalance
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetBalance resets all changes to the "balance" field.
+func (m *TransactionMutation) ResetBalance() {
+	m.balance = nil
+	m.addbalance = nil
+}
+
 // SetOperationTypeID sets the "operation_type_id" field.
 func (m *TransactionMutation) SetOperationTypeID(i int) {
 	m.operation_type = &i
@@ -1654,7 +1712,7 @@ func (m *TransactionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TransactionMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.create_time != nil {
 		fields = append(fields, transaction.FieldCreateTime)
 	}
@@ -1666,6 +1724,9 @@ func (m *TransactionMutation) Fields() []string {
 	}
 	if m.amount != nil {
 		fields = append(fields, transaction.FieldAmount)
+	}
+	if m.balance != nil {
+		fields = append(fields, transaction.FieldBalance)
 	}
 	if m.operation_type != nil {
 		fields = append(fields, transaction.FieldOperationTypeID)
@@ -1689,6 +1750,8 @@ func (m *TransactionMutation) Field(name string) (ent.Value, bool) {
 		return m.AccountID()
 	case transaction.FieldAmount:
 		return m.Amount()
+	case transaction.FieldBalance:
+		return m.Balance()
 	case transaction.FieldOperationTypeID:
 		return m.OperationTypeID()
 	case transaction.FieldTimestamp:
@@ -1710,6 +1773,8 @@ func (m *TransactionMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldAccountID(ctx)
 	case transaction.FieldAmount:
 		return m.OldAmount(ctx)
+	case transaction.FieldBalance:
+		return m.OldBalance(ctx)
 	case transaction.FieldOperationTypeID:
 		return m.OldOperationTypeID(ctx)
 	case transaction.FieldTimestamp:
@@ -1751,6 +1816,13 @@ func (m *TransactionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAmount(v)
 		return nil
+	case transaction.FieldBalance:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBalance(v)
+		return nil
 	case transaction.FieldOperationTypeID:
 		v, ok := value.(int)
 		if !ok {
@@ -1776,6 +1848,9 @@ func (m *TransactionMutation) AddedFields() []string {
 	if m.addamount != nil {
 		fields = append(fields, transaction.FieldAmount)
 	}
+	if m.addbalance != nil {
+		fields = append(fields, transaction.FieldBalance)
+	}
 	return fields
 }
 
@@ -1786,6 +1861,8 @@ func (m *TransactionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case transaction.FieldAmount:
 		return m.AddedAmount()
+	case transaction.FieldBalance:
+		return m.AddedBalance()
 	}
 	return nil, false
 }
@@ -1801,6 +1878,13 @@ func (m *TransactionMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddAmount(v)
+		return nil
+	case transaction.FieldBalance:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBalance(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Transaction numeric field %s", name)
@@ -1840,6 +1924,9 @@ func (m *TransactionMutation) ResetField(name string) error {
 		return nil
 	case transaction.FieldAmount:
 		m.ResetAmount()
+		return nil
+	case transaction.FieldBalance:
+		m.ResetBalance()
 		return nil
 	case transaction.FieldOperationTypeID:
 		m.ResetOperationTypeID()

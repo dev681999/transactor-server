@@ -3,8 +3,8 @@
 package account
 
 import (
-	"transactor-server/pkg/db/ent/predicate"
 	"time"
+	"transactor-server/pkg/db/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

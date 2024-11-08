@@ -3,13 +3,13 @@
 package ent
 
 import (
+	"context"
+	"fmt"
+	"math"
 	"transactor-server/pkg/db/ent/account"
 	"transactor-server/pkg/db/ent/operationtype"
 	"transactor-server/pkg/db/ent/predicate"
 	"transactor-server/pkg/db/ent/transaction"
-	"context"
-	"fmt"
-	"math"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
