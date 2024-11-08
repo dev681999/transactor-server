@@ -5,9 +5,8 @@ import (
 	"time"
 	"transactor-server/pkg/db/ent"
 	"transactor-server/pkg/db/ent/transaction"
-	"transactor-server/pkg/infra/log"
 
-	"go.uber.org/zap"
+	"entgo.io/ent/dialect/sql"
 )
 
 // DAO defines the data access object interface for transaction model
@@ -38,21 +37,31 @@ func (d *dao) Create(ctx context.Context, req *CreateRequest) (*ent.Transaction,
 
 	balance := req.Amount
 
+	lastID := 0
+
 	for balance > 0 {
 		balanceTransactions, err := tx.Transaction.
 			Query().
 			Where(
 				transaction.BalanceLT(0),
 				transaction.AccountID(req.AccountID),
+				transaction.IDGT(lastID),
 			).
+			Order(
+				transaction.ByID(sql.OrderAsc()),
+			).
+			Limit(10).
 			All(ctx)
 		if err != nil {
 			tx.Rollback()
 			return nil, err
 		}
 
+		if len(balanceTransactions) < 1 {
+			break
+		}
+
 		for _, balanceTransaction := range balanceTransactions {
-			log.L.Debug("balancing", zap.Any("balanceTxn", balanceTransaction))
 			txBalance := balanceTransaction.Balance * -1
 			if txBalance >= balance {
 				err = tx.Transaction.
@@ -63,8 +72,6 @@ func (d *dao) Create(ctx context.Context, req *CreateRequest) (*ent.Transaction,
 					tx.Rollback()
 					return nil, err
 				}
-
-				log.L.Debug("partial balancing", zap.Any("balanceID", balanceTransaction.ID), zap.Any("newBalanace", balanceTransaction.Balance+balance))
 
 				balance = 0
 			} else if balance > txBalance {
@@ -77,13 +84,14 @@ func (d *dao) Create(ctx context.Context, req *CreateRequest) (*ent.Transaction,
 					return nil, err
 				}
 				balance -= txBalance
-				log.L.Debug("full balancing", zap.Any("balanceID", balanceTransaction.ID), zap.Any("newBalanace", 0))
 			}
 
 			if balance == 0 {
 				break
 			}
 		}
+
+		lastID = balanceTransactions[len(balanceTransactions)-1].ID
 	}
 
 	dbTxn, err := tx.Transaction.
